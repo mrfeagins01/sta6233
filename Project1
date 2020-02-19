@@ -1,0 +1,74 @@
+#Bring In Libraries
+
+library(robotstxt)
+library(rvest)
+library(selectr)
+library(xml2)
+library(dplyr)
+library(stringr)
+library(forcats)
+library(magrittr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(tibble)
+library(purrr)
+
+#Let us check if we can scrape the data from the website
+paths_allowed(
+  paths = c("https://www.amazon.com/Best-Sellers-Beauty-Body-Skin-Care-Products/zgbs/beauty/11060521/ref=zg_bs_nav_bt_2_11060451")
+)
+
+#read webpage
+sc<-read_html("https://www.amazon.com/Best-Sellers-Beauty-Body-Skin-Care-Products/zgbs/beauty/11060521/ref=zg_bs_nav_bt_2_11060451",stringsAsFactors=FALSE)
+sc
+
+#does page have any tables?
+tbls<-html_table(sc,"table")
+head(tbls)
+
+#skincare body products
+sc %>%
+  html_nodes(".zg-item-immersion a") %>%
+  html_text() %>%
+  str_split('\\(') %>%
+  map_chr(1) %>%
+  str_trim()->body
+  body_char_only<-as.character(body)
+  
+
+#Create matrix for skincare body products
+body_table<-matrix(ncol=4,nrow=7)
+body_table[,1]<-body_char_only[1]
+body_table[,2]<-body_char_only[2]
+body_table[,3]<-body_char_only[3]
+body_table[,4]<-body_char_only[4]
+body_table[2,1]<-body_char_only[5]
+body_table[2,2]<-body_char_only[6]
+body_table[2,3]<-body_char_only[7]
+body_table[2,4]<-body_char_only[8]
+body_table[3,1]<-body_char_only[9]
+body_table[3,2]<-body_char_only[10]
+body_table[3,3]<-body_char_only[11]
+body_table[3,4]<-body_char_only[12]
+body_table[4,1]<-body_char_only[13]
+body_table[4,2]<-body_char_only[14]
+body_table[4,3]<-body_char_only[15]
+body_table[4,4]<-body_char_only[16]
+body_table[5,1]<-body_char_only[17]
+body_table[5,2]<-body_char_only[18]
+body_table[5,3]<-body_char_only[19]
+body_table[5,4]<-body_char_only[20]
+body_table[6,1]<-body_char_only[21]
+body_table[6,2]<-body_char_only[22]
+body_table[6,3]<-body_char_only[23]
+body_table[6,4]<-body_char_only[24]
+body_table[7,1]<-body_char_only[25]
+body_table[7,2]<-body_char_only[26]
+body_table[7,3]<-body_char_only[27]
+body_table[7,4]<-body_char_only[28]
+
+body_table<-data.frame(body_table)
+body_table$X4<-as.factor(body_table$X4)
+mean(body_table$X4)
+barplot(body_table$X4)
